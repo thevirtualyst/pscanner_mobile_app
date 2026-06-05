@@ -1,31 +1,33 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import StoreListScreen from './screens/StoreListScreen';
+import BranchListScreen from './screens/BranchListScreen';
+import type { RootStackParamList } from './types';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Shelf</Text>
-      <Text style={styles.subtitle}>App is loading correctly ✓</Text>
+    <NavigationContainer>
       <StatusBar style="auto" />
-    </View>
+      <Stack.Navigator
+        screenOptions={{
+          headerTintColor: '#16a34a',
+          headerTitleStyle: { fontWeight: '700' },
+        }}
+      >
+        <Stack.Screen
+          name="StoreList"
+          component={StoreListScreen}
+          options={{ title: 'Select Store' }}
+        />
+        <Stack.Screen
+          name="BranchList"
+          component={BranchListScreen}
+          options={({ route }) => ({ title: route.params.store.name })}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#16a34a',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
-});
