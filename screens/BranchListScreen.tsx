@@ -1,5 +1,4 @@
 import {
-  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -11,15 +10,15 @@ import type { Branch, RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BranchList'>;
 
-export default function BranchListScreen({ route }: Props) {
+export default function BranchListScreen({ route, navigation }: Props) {
   const { store } = route.params;
 
   function handleSelect(branch: Branch) {
-    Alert.alert(
-      'Branch selected',
-      `${branch.name}${branch.address ? '\n' + branch.address : ''}`,
-      [{ text: 'OK' }],
-    );
+    navigation.navigate('Scanner', {
+      branchId: branch.id,
+      branchName: branch.name,
+      storeName: store.name,
+    });
   }
 
   return (
@@ -60,16 +59,21 @@ const styles = StyleSheet.create({
   row: {
     paddingVertical: 16,
     paddingHorizontal: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   branchName: {
     fontSize: 17,
     fontWeight: '600',
     color: '#111827',
-    marginBottom: 2,
+    flex: 1,
   },
   address: {
     fontSize: 13,
     color: '#6b7280',
+    flex: 1,
+    textAlign: 'right',
   },
   empty: {
     paddingTop: 48,

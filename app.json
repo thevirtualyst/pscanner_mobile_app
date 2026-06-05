@@ -14,15 +14,27 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.virtualist.shelf.new"
+      "bundleIdentifier": "com.virtualist.shelf.new",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera is used to scan product barcodes."
+      }
     },
     "android": {
       "package": "com.virtualist.shelf.new",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["android.permission.CAMERA"]
     },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Shelf to access your camera to scan product barcodes."
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }

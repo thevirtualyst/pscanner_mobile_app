@@ -3,6 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import StoreListScreen from './screens/StoreListScreen';
 import BranchListScreen from './screens/BranchListScreen';
+import ScannerScreen from './screens/ScannerScreen';
+import ProductDetailScreen from './screens/ProductDetailScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -26,6 +28,16 @@ export default function App() {
           name="BranchList"
           component={BranchListScreen}
           options={({ route }) => ({ title: route.params.store.name })}
+        />
+        <Stack.Screen
+          name="Scanner"
+          component={ScannerScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ProductDetail"
+          component={ProductDetailScreen}
+          options={{ title: 'Product Details' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
