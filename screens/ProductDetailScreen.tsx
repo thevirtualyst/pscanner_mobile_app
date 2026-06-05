@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
+import { clearLastBranch } from '../lib/storage';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductDetail'>;
 
@@ -83,6 +84,17 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
       <TouchableOpacity style={styles.scanBtn} onPress={() => navigation.goBack()}>
         <Text style={styles.scanBtnText}>Scan Another Product</Text>
       </TouchableOpacity>
+
+      {/* Change store */}
+      <TouchableOpacity
+        style={styles.changeStoreBtn}
+        onPress={async () => {
+          await clearLastBranch();
+          navigation.reset({ index: 0, routes: [{ name: 'StoreList' }] });
+        }}
+      >
+        <Text style={styles.changeStoreText}>Change Store / Branch</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -146,4 +158,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scanBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  changeStoreBtn: { marginTop: 12, alignItems: 'center', paddingVertical: 10 },
+  changeStoreText: { color: '#9ca3af', fontSize: 14 },
 });

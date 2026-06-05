@@ -1,11 +1,14 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  Easing,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList, ScanResult } from '../types';
@@ -16,10 +19,31 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Scanner'>;
 
 export default function ScannerScreen({ route, navigation }: Props) {
   const { branchId, branchName, storeName } = route.params;
+  const insets = useSafeAreaInsets();
   const [permission, requestPermission] = useCameraPermissions();
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cooldown = useRef(false);
+  const scanLine = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scanLine, {
+          toValue: 1,
+          duration: 1800,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scanLine, {
+          toValue: 0,
+          duration: 1800,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [scanLine]);
 
   const handleBarcode = useCallback(
     async ({ data: barcode }: { data: string }) => {
@@ -77,7 +101,11 @@ export default function ScannerScreen({ route, navigation }: Props) {
 
       {/* Dimmed overlay with viewfinder cutout */}
       <View style={styles.overlay}>
-        <View style={styles.overlayTop} />
+        <View style={[styles.overlayTop, { paddingTop: insets.top + 8 }]}>
+          <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
+            <Text style={styles.closeBtnText}>✕</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.overlayMiddle}>
           <View style={styles.overlaySide} />
           <View style={styles.viewfinder}>
@@ -85,6 +113,19 @@ export default function ScannerScreen({ route, navigation }: Props) {
             <View style={[styles.corner, styles.cornerTR]} />
             <View style={[styles.corner, styles.cornerBL]} />
             <View style={[styles.corner, styles.cornerBR]} />
+            <Animated.View
+              style={[
+                styles.scanLine,
+                {
+                  transform: [{
+                    translateY: scanLine.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, VIEWFINDER - 2],
+                    }),
+                  }],
+                },
+              ]}
+            />
           </View>
           <View style={styles.overlaySide} />
         </View>
@@ -120,7 +161,16 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 
   overlay: { ...StyleSheet.absoluteFillObject },
-  overlayTop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
+  overlayTop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 16, alignItems: 'flex-end' },
+  closeBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   overlayMiddle: { flexDirection: 'row', height: VIEWFINDER },
   overlaySide: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
   overlayBottom: {
@@ -145,6 +195,18 @@ const styles = StyleSheet.create({
   cornerBL: { bottom: 0, left: 0, borderBottomWidth: BORDER, borderLeftWidth: BORDER },
   cornerBR: { bottom: 0, right: 0, borderBottomWidth: BORDER, borderRightWidth: BORDER },
 
+  scanLine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: '#16a34a',
+    shadowColor: '#16a34a',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 6,
+    elevation: 4,
+  },
   storeLabel: { color: '#d1fae5', fontSize: 13, fontWeight: '600' },
   hint: { color: 'rgba(255,255,255,0.7)', fontSize: 14, marginTop: 12 },
   errorText: {

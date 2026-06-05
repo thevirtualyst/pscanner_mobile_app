@@ -47,6 +47,7 @@ export type ScanResult = {
 export type RootStackParamList = {
   StoreList: undefined;
   BranchList: { store: Store };
+  BranchHome: { branchId: string; branchName: string; storeName: string; branchAddress?: string | null };
   Scanner: { branchId: string; branchName: string; storeName: string };
   ProductDetail: { result: ScanResult };
 };
